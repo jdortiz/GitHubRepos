@@ -111,6 +111,7 @@ public class GithubReposFragment extends Fragment {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
+            Log.d(LOG_TAG, response);
             mTextViewRepos.setText(response);
         }
     }

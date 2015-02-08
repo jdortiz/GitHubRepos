@@ -1,7 +1,6 @@
 package com.powwau.githubrepos;
 
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class GithubReposActivity extends ActionBarActivity {
@@ -53,6 +54,8 @@ public class GithubReposActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        EditText mEditTextUsername;
+
         public PlaceholderFragment() {
         }
 
@@ -60,6 +63,16 @@ public class GithubReposActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_github_repos, container, false);
+            mEditTextUsername = (EditText)rootView.findViewById(R.id.edit_text_username);
+            Button buttonGetRepos = (Button)rootView.findViewById(R.id.button_get_repos);
+            buttonGetRepos.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String username = mEditTextUsername.getText().toString();
+                    String message = String.format(getString(R.string.getting_repos_for_user), username);
+                    Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                }
+            });
             return rootView;
         }
     }

@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +25,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -57,7 +64,7 @@ public class GithubReposFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             String username;
-            String response = "";
+            String listOfRepos = "";
             if (params.length > 0) {
                 username = params[0];
             } else {
@@ -67,7 +74,8 @@ public class GithubReposFragment extends Fragment {
                 URL query = constructURLQuery(username);
                 HttpURLConnection httpConnection = (HttpURLConnection)query.openConnection();
                 try {
-                    response = readFullResponse(httpConnection.getInputStream());
+                    String response = readFullResponse(httpConnection.getInputStream());
+                    listOfRepos = parseResponse(response);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -76,7 +84,7 @@ public class GithubReposFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return response;
+            return listOfRepos;
         }
 
         private URL constructURLQuery(String username) throws MalformedURLException {
@@ -106,6 +114,25 @@ public class GithubReposFragment extends Fragment {
                 response = stringBuilder.toString();
             }
             return response;
+        }
+
+        private String parseResponse(String response) {
+            final String REPO_NAME = "name";
+            String listOfRepos;
+            List<String> repos = new ArrayList<>();
+            try {
+                JSONArray reposJsonArray = new JSONArray(response);
+                JSONObject object;
+                for(int i = 0; i < reposJsonArray.length(); i++) {
+                    object = reposJsonArray.getJSONObject(i);
+                    repos.add(object.getString(REPO_NAME));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            listOfRepos = TextUtils.join(", ", repos);
+
+            return listOfRepos;
         }
 
         @Override
